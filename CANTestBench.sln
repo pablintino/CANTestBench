@@ -5,6 +5,8 @@ VisualStudioVersion = 16.0.29613.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CANTestBench", "CANTestBench\CANTestBench.vcxproj", "{14309DB8-FCFE-49EF-9065-04F07A2AD31E}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CANBusInterface", "CANBusInterface\CANBusInterface.vcxproj", "{737D3C86-1849-4CCA-B25F-F3C262ED2D1B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,6 +23,14 @@ Global
 		{14309DB8-FCFE-49EF-9065-04F07A2AD31E}.Release|x64.Build.0 = Release|x64
 		{14309DB8-FCFE-49EF-9065-04F07A2AD31E}.Release|x86.ActiveCfg = Release|Win32
 		{14309DB8-FCFE-49EF-9065-04F07A2AD31E}.Release|x86.Build.0 = Release|Win32
+		{737D3C86-1849-4CCA-B25F-F3C262ED2D1B}.Debug|x64.ActiveCfg = Debug|x64
+		{737D3C86-1849-4CCA-B25F-F3C262ED2D1B}.Debug|x64.Build.0 = Debug|x64
+		{737D3C86-1849-4CCA-B25F-F3C262ED2D1B}.Debug|x86.ActiveCfg = Debug|Win32
+		{737D3C86-1849-4CCA-B25F-F3C262ED2D1B}.Debug|x86.Build.0 = Debug|Win32
+		{737D3C86-1849-4CCA-B25F-F3C262ED2D1B}.Release|x64.ActiveCfg = Release|x64
+		{737D3C86-1849-4CCA-B25F-F3C262ED2D1B}.Release|x64.Build.0 = Release|x64
+		{737D3C86-1849-4CCA-B25F-F3C262ED2D1B}.Release|x86.ActiveCfg = Release|Win32
+		{737D3C86-1849-4CCA-B25F-F3C262ED2D1B}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
