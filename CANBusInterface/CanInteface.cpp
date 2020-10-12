@@ -23,12 +23,13 @@
 
 
 #include <algorithm>
+
+#include "CanException.h"
 #include "CanInterface.h"
+#include "fmt/core.h"
 
+CanInterface::CanInterface(std::string name) : _name(name) {}
 
-CanInterface::CanInterface(std::string name) {
-	this->_name = name;
-}
 std::vector<CanInterfaceChannel *> CanInterface::channels(void) {
 	// Return the channels vector as a raw pointers
 	std::vector<CanInterfaceChannel*> vecRaw;
@@ -37,12 +38,18 @@ std::vector<CanInterfaceChannel *> CanInterface::channels(void) {
 		[](auto& ptr) { return ptr.get(); });
 	return vecRaw;
 }
-std::string CanInterface::name(void) {
+
+std::string CanInterface::name() {
 	return this->_name;
 }
 
 CanInterfaceChannel* CanInterface::get_channel(unsigned int chan_number) {
-	return channels().at(chan_number);
+
+	if(chan_number < channels().size())
+	{
+		return channels().at(chan_number);
+	}
+	throw CanException(fmt::format("Channel {} doesn't exist", chan_number));
 }
 
 CanInterface::~CanInterface() {

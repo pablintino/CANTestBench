@@ -24,16 +24,19 @@
 
 #pragma once
 
-#include <iostream>
-#include "CanInterface.h"
-#include "KvaserCanChannel.h"
+#include <exception>
+#include <string>
 
 
-class KvaserCanInterface : public CanInterface
+class CanException : public std::exception
 {
+
 public:
-	static const std::string KVASER_INTERFACE_NAME;
-	KvaserCanInterface();
-	~KvaserCanInterface();
-	actionStatus initialize(void) override;
+    explicit CanException(const std::string& message);
+    const char* what() const noexcept override {
+        return message_.c_str();
+    }
+
+private:
+    std::string message_;
 };

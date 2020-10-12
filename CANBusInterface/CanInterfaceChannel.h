@@ -34,7 +34,8 @@ public:
 	std::string name(void);
 	bool vChannel(void);
 	virtual ~CanInterfaceChannel() {};
-	virtual CanChannelError connect(CanBitrates bitrate) = 0;
+	virtual CanChannelError configure(CanBitrates bitrate) = 0;
+	virtual CanChannelError connect() = 0;
 
 private:
 	std::string _name;

@@ -1,4 +1,4 @@
-/*	MIT License
+﻿/*	MIT License
  *
  *	Copyright(c) 2020 Pablo Rodriguez Nava, @pablintino
  *
@@ -23,17 +23,14 @@
 
 
 #pragma once
+#include <memory>
+#include <string>
 
-#include <iostream>
 #include "CanInterface.h"
-#include "KvaserCanChannel.h"
 
 
-class KvaserCanInterface : public CanInterface
+class CanIntefaceFactory
 {
 public:
-	static const std::string KVASER_INTERFACE_NAME;
-	KvaserCanInterface();
-	~KvaserCanInterface();
-	actionStatus initialize(void) override;
+	static std::unique_ptr<CanInterface> make_inteface(std::string iface_type);
 };

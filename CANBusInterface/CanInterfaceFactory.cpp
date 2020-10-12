@@ -1,4 +1,4 @@
-/*	MIT License
+﻿/*	MIT License
  *
  *	Copyright(c) 2020 Pablo Rodriguez Nava, @pablintino
  *
@@ -22,18 +22,21 @@
  */
 
 
-#pragma once
+#include "CanInterfaceFactory.h"
+#include <algorithm>
 
-#include <iostream>
-#include "CanInterface.h"
-#include "KvaserCanChannel.h"
+#include "CanException.h"
+#include "KvaserCanInterface.h"
 
 
-class KvaserCanInterface : public CanInterface
+std::unique_ptr<CanInterface> CanIntefaceFactory::make_inteface(std::string iface_type)
 {
-public:
-	static const std::string KVASER_INTERFACE_NAME;
-	KvaserCanInterface();
-	~KvaserCanInterface();
-	actionStatus initialize(void) override;
-};
+	std::transform(iface_type.begin(), iface_type.end(), iface_type.begin(), ::tolower);
+	if(KvaserCanInterface::KVASER_INTERFACE_NAME == iface_type)
+	{
+		return std::make_unique<KvaserCanInterface>();
+	}
+
+	throw CanException("The given interface is not supported");
+}
+

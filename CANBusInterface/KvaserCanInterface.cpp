@@ -25,9 +25,10 @@
 #include "KvaserCanInterface.h"
 #include <spdlog/spdlog.h>
 #include "KvaserUtils.h"
+#include "canlib.h"
 
 
-const std::string KvaserCanInterface::KVASER_INTERFACE_NAME = "Kvaser SDK";
+const std::string KvaserCanInterface::KVASER_INTERFACE_NAME = "kvaser";
 
 KvaserCanInterface::KvaserCanInterface(): CanInterface(KVASER_INTERFACE_NAME) {
 	canInitializeLibrary();
@@ -74,6 +75,6 @@ actionStatus KvaserCanInterface::initialize(void) {
 KvaserCanInterface::~KvaserCanInterface() {
 	canStatus stat = canUnloadLibrary();
 	if (stat < 0) {
-		std::cout << "Unitialize failed!";
+		spdlog::error("Cannot release Kvaser SDK resources. [err_code: {}, err: {}]", stat, KvaserUtils::from_kvaser_status(stat));
 	}
 }

@@ -24,6 +24,8 @@
 
 #include <spdlog/spdlog.h>
 #include "TestBenchOptions.h"
+#include "../CANBusInterface/CanException.h"
+#include "../CANBusInterface/CanInterfaceFactory.h"
 #include "../CANBusInterface/CanTypes.h"
 #include "../CANBusInterface/KvaserCanInterface.h"
 
@@ -31,30 +33,44 @@
 int main(int argc, char** argv)
 {
 
+	CanChannelError err;
+	
 	// TODO: Temporal hardcoded level
-    spdlog::set_level(spdlog::level::debug); // Set global log level to debug
+	spdlog::set_level(spdlog::level::debug); // Set global log level to debug
 
-    std::unique_ptr<TestBenchOptions> opts = TestBenchOptions::parse(argc, argv);
+	std::unique_ptr<TestBenchOptions> opts = TestBenchOptions::parse(argc, argv);
 
 	if (opts == nullptr)
 	{
-        return 0;
+		return 0;
 	}
 
-	// TODO: Temporal. CAN interface should be provided by a factory based on program arguments
-	KvaserCanInterface iface = KvaserCanInterface();
-    actionStatus status = iface.initialize();
+	try
+	{
+		// Obtain the selected CAN interface
+		std::unique_ptr<CanInterface> iface = CanIntefaceFactory::make_inteface(opts->interface_type());
 
-    if (status == actionStatus::OK) {
-    	// TODO: Think about makint a try-get_channel or handle some kind of exception if channel index goes out index
-        CanInterfaceChannel* chan = iface.get_channel(opts->interface_channel());
-        spdlog::info("Selected CAN channel. [channel_name: {}, is_virtual: {}]", chan->name(), chan->vChannel());
-        CanChannelError err = chan->connect(opts->baudrate());
-    	if (err != CanChannelError::NO_ERR)
-    	{
-            return -1;
-    	}
-    }
+		actionStatus status = iface->initialize();
+
+		if (status == actionStatus::OK) {
+			CanInterfaceChannel* chan = iface->get_channel(opts->interface_channel());
+			spdlog::info("Selected CAN channel. [channel_name: {}, is_virtual: {}]", chan->name(), chan->vChannel());
+			err = chan->configure(opts->baudrate());
+			if (err != CanChannelError::NO_ERR)
+			{
+				return -1;
+			}
+
+			err = chan->connect();
+			if (err != CanChannelError::NO_ERR)
+			{
+				return -1;
+			}
+		}
+	}catch (const CanException& ex)
+	{
+		spdlog::error("An error occurred while initializing CAN interface. {}", ex.what());
+	}
 
 	// TODO: Ready to go On-Bus and write raw data to the proper interface
 }

@@ -60,14 +60,15 @@ std::unique_ptr<TestBenchOptions> TestBenchOptions::parse(int argc, char** argv)
 		if (vm.count("baudrate"))
 		{
 			unsigned int bitrate_opt = vm["baudrate"].as<unsigned int>();
-			if(!check_baud_rate_enum_class(bitrate_opt))
+			if (!check_baud_rate_enum_class(bitrate_opt))
 			{
 				// TODO: Consider using a custom exception
 				throw std::runtime_error("The given bitrate is not supported");
 			}
 
 			tmp->baudrate_ = static_cast<CanBitrates>(bitrate_opt);
-		}else
+		}
+		else
 		{
 			tmp->baudrate_ = CanBitrates::CAN500K;
 		}

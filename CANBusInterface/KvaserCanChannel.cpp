@@ -27,7 +27,7 @@
 #include "CanTypes.h"
 #include "KvaserUtils.h"
 
-KvaserCanChannel::KvaserCanChannel(unsigned int sdkIndex, std::string name, bool vChannel) : sdkIndex(sdkIndex), CanInterfaceChannel(name, vChannel){
+KvaserCanChannel::KvaserCanChannel(const unsigned int sdkIndex, const std::string name, const bool vChannel) : sdkIndex(sdkIndex), CanInterfaceChannel(name, vChannel){
 }
 
 KvaserCanChannel::~KvaserCanChannel() {
@@ -35,7 +35,7 @@ KvaserCanChannel::~KvaserCanChannel() {
 }
 
 
-long to_kvaser_bitrate(CanBitrates bitrate)
+long to_kvaser_bitrate(const CanBitrates bitrate)
 {
 	switch (bitrate) {
 		case CanBitrates::CAN1M:
@@ -62,7 +62,7 @@ long to_kvaser_bitrate(CanBitrates bitrate)
 }
 
 
-CanChannelError KvaserCanChannel::connect(CanBitrates bitrate) {
+CanChannelError KvaserCanChannel::configure(const CanBitrates bitrate) {
 
 	canStatus stat;
 	int flags = this->vChannel() ? canOPEN_ACCEPT_VIRTUAL : 0;
@@ -80,6 +80,22 @@ CanChannelError KvaserCanChannel::connect(CanBitrates bitrate) {
 	}
 	spdlog::debug("Kvaser CAN interface configured. [name: {}, bitrate: {}]", this->name(), bitrate);
 
+	return CanChannelError::NO_ERR;
+	
+}
+
+
+CanChannelError KvaserCanChannel::connect()
+{
+	canStatus stat;
+	stat = canBusOn(hnd);
+	if (stat != canOK)
+	{
+		spdlog::error("Cannot connect Kvaser CAN channel. [err_code: {}, err: {}]", hnd, KvaserUtils::from_kvaser_status((canStatus)hnd));
+		return CanChannelError::INITIALIZATION_ERR;
+	}
+
+	spdlog::debug("Kvaser CAN channel on bus.");
 	return CanChannelError::NO_ERR;
 	
 }

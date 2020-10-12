@@ -34,7 +34,8 @@ class KvaserCanChannel : public CanInterfaceChannel
 public:
 	KvaserCanChannel(unsigned int sdkIndex, std::string name, bool vChannel);
 	~KvaserCanChannel();
-	CanChannelError connect(CanBitrates bitrate);
+	CanChannelError configure(CanBitrates bitrate) override;
+	CanChannelError connect() override;
 
 private:
 	unsigned int sdkIndex;

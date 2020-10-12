@@ -153,16 +153,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CanException.cpp" />
     <ClCompile Include="CanInteface.cpp" />
     <ClCompile Include="CanInterfaceChannel.cpp" />
+    <ClCompile Include="CanInterfaceFactory.cpp" />
     <ClCompile Include="CanUtils.cpp" />
     <ClCompile Include="KvaserCanChannel.cpp" />
     <ClCompile Include="KvaserCanInterface.cpp" />
     <ClCompile Include="KvaserUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CanException.h" />
     <ClInclude Include="CanInterface.h" />
     <ClInclude Include="CanInterfaceChannel.h" />
+    <ClInclude Include="CanInterfaceFactory.h" />
     <ClInclude Include="CanTypes.h" />
     <ClInclude Include="CanUtils.h" />
     <ClInclude Include="KvaserCanChannel.h" />
