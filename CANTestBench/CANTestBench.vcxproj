@@ -25,6 +25,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TestBenchOptions.h" />
+    <ClInclude Include="TestBenchTest.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CANTestBench.cpp" />

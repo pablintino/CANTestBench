@@ -153,6 +153,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CanDataDescriptor.cpp" />
     <ClCompile Include="CanException.cpp" />
     <ClCompile Include="CanInteface.cpp" />
     <ClCompile Include="CanInterfaceChannel.cpp" />
@@ -163,6 +164,7 @@
     <ClCompile Include="KvaserUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CanDataDescriptor.h" />
     <ClInclude Include="CanException.h" />
     <ClInclude Include="CanInterface.h" />
     <ClInclude Include="CanInterfaceChannel.h" />

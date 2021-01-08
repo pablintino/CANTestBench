@@ -36,6 +36,8 @@ public:
 	~KvaserCanChannel();
 	CanChannelError configure(CanBitrates bitrate) override;
 	CanChannelError connect() override;
+	CanChannelError disconnect() override;
+	CanDataDescriptor read(CanChannelError& err) override;
 
 private:
 	unsigned int sdkIndex;

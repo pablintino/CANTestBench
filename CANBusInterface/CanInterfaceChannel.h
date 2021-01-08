@@ -24,7 +24,7 @@
 
 #pragma once
 
-#include <iostream>
+#include "CanDataDescriptor.h"
 #include "CanTypes.h"
 
 class CanInterfaceChannel
@@ -36,7 +36,8 @@ public:
 	virtual ~CanInterfaceChannel() {};
 	virtual CanChannelError configure(CanBitrates bitrate) = 0;
 	virtual CanChannelError connect() = 0;
-
+	virtual CanChannelError disconnect() = 0;
+	virtual CanDataDescriptor read(CanChannelError& err) = 0;
 private:
 	std::string _name;
 	bool _vChannel;

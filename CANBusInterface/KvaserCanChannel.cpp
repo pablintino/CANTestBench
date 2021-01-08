@@ -99,3 +99,40 @@ CanChannelError KvaserCanChannel::connect()
 	return CanChannelError::NO_ERR;
 	
 }
+
+
+CanChannelError KvaserCanChannel::disconnect()
+{
+	canStatus stat;
+	stat = canBusOff(hnd);
+	if (stat != canOK)
+	{
+		spdlog::error("Cannot go off-bus on Kvaser CAN channel. [err_code: {}, err: {}]", hnd, KvaserUtils::from_kvaser_status((canStatus)hnd));
+		return CanChannelError::INITIALIZATION_ERR;
+	}
+
+	spdlog::debug("Kvaser CAN channel off-bus.");
+	return CanChannelError::NO_ERR;
+
+}
+
+CanDataDescriptor KvaserCanChannel::read(CanChannelError& err)
+{
+	canStatus stat;
+
+	long id = 0;
+	uint8_t data[8];
+	unsigned int dlc, flags;
+	unsigned long timestamp;
+	
+	stat = canReadWait(hnd, &id , data, &dlc, &flags, &timestamp, 0xFFFFFFFF);
+	if (stat != canOK) {
+
+		spdlog::error("Kvaser CAN channel failed to read data.");
+		err = CanChannelError::READ_ERROR;
+	}
+	// TODO Cannot return data if error. This needs to be reestructured
+	err = CanChannelError::NO_ERR;
+	return CanDataDescriptor(id, dlc, std::vector<uint8_t>(std::begin(data), std::end(data)));
+	
+}

@@ -46,5 +46,6 @@ enum class CanBitrates {
 enum class CanChannelError
 {
 	NO_ERR = 0,
-	INITIALIZATION_ERR = -1
+	INITIALIZATION_ERR = -1,
+	READ_ERROR = -2
 };

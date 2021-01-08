@@ -66,6 +66,25 @@ int main(int argc, char** argv)
 			{
 				return -1;
 			}
+
+			/* TODO Test infinite loop*/
+			for(int i = 0; i< 4; i++)
+			{
+				CanChannelError err;
+				CanDataDescriptor data = chan->read(err);
+				if(err == CanChannelError::NO_ERR)
+				{
+					spdlog::info("Readed data. [data_id: {}]", data.get_id());
+				}
+				
+			}
+
+			err = chan->disconnect();
+			if (err != CanChannelError::NO_ERR)
+			{
+				return -1;
+			}
+			
 		}
 	}catch (const CanException& ex)
 	{
