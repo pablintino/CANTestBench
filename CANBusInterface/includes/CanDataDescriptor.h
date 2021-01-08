@@ -38,7 +38,7 @@ public:
 	long get_id();
 private:
 	std::vector<uint8_t> _data;
-	uint _dlc;
+	uint8_t _dlc;
 	long _id;
 };
 
