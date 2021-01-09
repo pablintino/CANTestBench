@@ -22,23 +22,14 @@
  */
 
 
-#ifndef TEST_BENCH_TEST_H
-#define TEST_BENCH_TEST_H
+#include <ReceiveSimpleFramesTest.h>
+#include <stdexcept>
+#include "TestFactory.h"
 
+std::unique_ptr<TestBenchTest> TestFactory::get_test(std::string test_name) {
 
-#include <memory>
-#include "CanInterfaceChannel.h"
-
-class TestBenchTest
-{
-public:
-	TestBenchTest(std::string name);
-	std::string name(void);
-	virtual ~TestBenchTest() {};
-	virtual bool run(std::shared_ptr<CanInterfaceChannel> channel) = 0;
-
-private:
-    std::string _name;
-};
-
-#endif
+    if(test_name == ReceiveSimpleFramesTest::TEST_NAME) {
+        return std::make_unique<ReceiveSimpleFramesTest>();
+    }
+    throw std::runtime_error("The given test is not available");
+}

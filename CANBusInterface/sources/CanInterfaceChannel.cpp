@@ -33,7 +33,7 @@ CanInterfaceChannel::CanInterfaceChannel(std::string name, bool vChannel) : _nam
 std::string CanInterfaceChannel::name(void) {
 	return _name;
 }
+
 bool CanInterfaceChannel::vChannel(void) {
 	return _vChannel;
 }
-

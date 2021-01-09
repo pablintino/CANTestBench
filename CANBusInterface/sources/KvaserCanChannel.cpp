@@ -24,6 +24,7 @@
 
 #include "KvaserCanChannel.h"
 #include <spdlog/spdlog.h>
+#include <CanException.h>
 #include "CanTypes.h"
 #include "KvaserUtils.h"
 
@@ -116,7 +117,7 @@ CanChannelError KvaserCanChannel::disconnect()
 
 }
 
-CanDataDescriptor KvaserCanChannel::read(CanChannelError& err)
+CanDataDescriptor KvaserCanChannel::read(uint32_t timeout)
 {
 	canStatus stat;
 
@@ -125,14 +126,22 @@ CanDataDescriptor KvaserCanChannel::read(CanChannelError& err)
 	unsigned int dlc, flags;
 	unsigned long timestamp;
 	
-	stat = canReadWait(hnd, &id , data, &dlc, &flags, &timestamp, 0xFFFFFFFF);
+	stat = canReadWait(hnd, &id , data, &dlc, &flags, &timestamp, timeout);
 	if (stat != canOK) {
-
-		spdlog::error("Kvaser CAN channel failed to read data.");
-		err = CanChannelError::READ_ERROR;
+		throw CanException("Kvaser CAN channel failed to read data", CanChannelError::READ_ERROR);
 	}
-	// TODO Cannot return data if error. This needs to be reestructured
-	err = CanChannelError::NO_ERR;
 	return CanDataDescriptor(id, dlc, std::vector<uint8_t>(std::begin(data), std::end(data)));
-	
+
+}
+
+
+void KvaserCanChannel::write(uint32_t id, std::vector<uint8_t> data)
+{
+    canStatus stat;
+
+    //TODO Hardcoded flags
+    stat = canWrite(hnd, id , data.data(), data.size(), canMSG_STD);
+    if (stat != canOK) {
+        throw CanException("Kvaser CAN channel failed to write data", CanChannelError::READ_ERROR);
+    }
 }

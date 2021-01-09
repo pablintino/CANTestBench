@@ -30,51 +30,52 @@
 
 const std::string KvaserCanInterface::KVASER_INTERFACE_NAME = "kvaser";
 
-KvaserCanInterface::KvaserCanInterface(): CanInterface(KVASER_INTERFACE_NAME) {
-	canInitializeLibrary();
+KvaserCanInterface::KvaserCanInterface() : CanInterface(KVASER_INTERFACE_NAME) {
+    canInitializeLibrary();
 }
 
 
 actionStatus KvaserCanInterface::initialize(void) {
-	
-	unsigned long tmp;
-	char chName[254];
-	int nChannels;
-	canStatus stat = canGetNumberOfChannels(&nChannels);
-	if (stat == canOK && nChannels > 0 && nChannels < 300) {
-		for (unsigned int i = 0; i < nChannels; i++) {
-			
-			stat = canGetChannelData(i, canCHANNELDATA_CHANNEL_CAP, &tmp, sizeof(tmp));
-			if (stat == canOK) {
-				stat = canGetChannelData(i, canCHANNELDATA_DEVDESCR_ASCII, &chName, sizeof(chName));
-				if (stat == canOK) {
-					_channels.push_back(std::make_unique<KvaserCanChannel>(i, std::string(chName), tmp & canCHANNEL_CAP_VIRTUAL));
-				}
-				else {
-					spdlog::error("Cannot retrieve channel {} name. [err_code: {}, err: {}]", i, stat, KvaserUtils::from_kvaser_status(stat));
-					return actionStatus::FAILED;
-				}
-			}
-			else {
-				spdlog::error("Cannot retrieve channel {} capabilities. [err_code: {}, err: {}]", i, stat, KvaserUtils::from_kvaser_status(stat));
-				return actionStatus::FAILED;
-			}
-		}
-	}
-	else if (stat != canOK){
-		spdlog::error("Cannot retrieve available Kvaser channels. [err_code: {}, err: {}]", stat, KvaserUtils::from_kvaser_status(stat));
-		return actionStatus::FAILED;
-	}else
-	{
-		spdlog::error("Kvaser channel count seems to be wrong. [nChannels={}]", nChannels);
-		return actionStatus::FAILED;
-	}
-	return actionStatus::OK;
+
+    unsigned long tmp;
+    char chName[254];
+    int nChannels;
+    canStatus stat = canGetNumberOfChannels(&nChannels);
+    if (stat == canOK && nChannels > 0 && nChannels < 300) {
+        for (unsigned int i = 0; i < nChannels; i++) {
+
+            stat = canGetChannelData(i, canCHANNELDATA_CHANNEL_CAP, &tmp, sizeof(tmp));
+            if (stat == canOK) {
+                stat = canGetChannelData(i, canCHANNELDATA_DEVDESCR_ASCII, &chName, sizeof(chName));
+                if (stat == canOK) {
+                    _channels.push_back(
+                            std::make_shared<KvaserCanChannel>(i, std::string(chName), tmp & canCHANNEL_CAP_VIRTUAL));
+                } else {
+                    spdlog::error("Cannot retrieve channel {} name. [err_code: {}, err: {}]", i, stat,
+                                  KvaserUtils::from_kvaser_status(stat));
+                    return actionStatus::FAILED;
+                }
+            } else {
+                spdlog::error("Cannot retrieve channel {} capabilities. [err_code: {}, err: {}]", i, stat,
+                              KvaserUtils::from_kvaser_status(stat));
+                return actionStatus::FAILED;
+            }
+        }
+    } else if (stat != canOK) {
+        spdlog::error("Cannot retrieve available Kvaser channels. [err_code: {}, err: {}]", stat,
+                      KvaserUtils::from_kvaser_status(stat));
+        return actionStatus::FAILED;
+    } else {
+        spdlog::error("Kvaser channel count seems to be wrong. [nChannels={}]", nChannels);
+        return actionStatus::FAILED;
+    }
+    return actionStatus::OK;
 }
 
 KvaserCanInterface::~KvaserCanInterface() {
-	canStatus stat = canUnloadLibrary();
-	if (stat < 0) {
-		spdlog::error("Cannot release Kvaser SDK resources. [err_code: {}, err: {}]", stat, KvaserUtils::from_kvaser_status(stat));
-	}
+    canStatus stat = canUnloadLibrary();
+    if (stat < 0) {
+        spdlog::error("Cannot release Kvaser SDK resources. [err_code: {}, err: {}]", stat,
+                      KvaserUtils::from_kvaser_status(stat));
+    }
 }

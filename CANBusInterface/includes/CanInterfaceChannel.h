@@ -28,20 +28,30 @@
 #include "CanDataDescriptor.h"
 #include "CanTypes.h"
 
-class CanInterfaceChannel
-{
+class CanInterfaceChannel {
 public:
-	CanInterfaceChannel(std::string name, bool vChannel);
-	std::string name(void);
-	bool vChannel(void);
-	virtual ~CanInterfaceChannel() {};
-	virtual CanChannelError configure(CanBitrates bitrate) = 0;
-	virtual CanChannelError connect() = 0;
-	virtual CanChannelError disconnect() = 0;
-	virtual CanDataDescriptor read(CanChannelError& err) = 0;
+    CanInterfaceChannel(std::string name, bool vChannel);
+
+    std::string name(void);
+
+    bool vChannel(void);
+
+    virtual ~CanInterfaceChannel() {};
+
+    virtual CanChannelError configure(CanBitrates bitrate) = 0;
+
+    virtual CanChannelError connect() = 0;
+
+    virtual CanChannelError disconnect() = 0;
+
+    virtual CanDataDescriptor read(uint32_t timeout) = 0;
+
+    virtual void write(uint32_t id, std::vector<uint8_t> data) = 0;
+
+
 private:
-	std::string _name;
-	bool _vChannel;
+    std::string _name;
+    bool _vChannel;
 };
 
 #endif

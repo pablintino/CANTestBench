@@ -35,14 +35,14 @@ class CanInterface
 {
 public:
 	CanInterface(std::string name);
-	std::vector<CanInterfaceChannel*> channels(void);
+	std::vector<std::shared_ptr<CanInterfaceChannel>> channels(void);
 	std::string name(void);
-	CanInterfaceChannel* get_channel(unsigned int chan_number);
+    std::shared_ptr<CanInterfaceChannel> get_channel(unsigned int chan_number);
 	virtual ~CanInterface();
 	virtual actionStatus initialize(void) = 0;
 protected:
 	void setName(std::string name);
-	std::vector<std::unique_ptr<CanInterfaceChannel>> _channels;
+	std::vector<std::shared_ptr<CanInterfaceChannel>> _channels;
 private:
 	std::string _name;
 };

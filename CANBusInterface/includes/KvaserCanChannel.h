@@ -39,7 +39,8 @@ public:
 	CanChannelError configure(CanBitrates bitrate) override;
 	CanChannelError connect() override;
 	CanChannelError disconnect() override;
-	CanDataDescriptor read(CanChannelError& err) override;
+    CanDataDescriptor read(uint32_t timeout) override;
+    void KvaserCanChannel::write(uint32_t id, std::vector<uint8_t> data) override;
 
 private:
 	unsigned int sdkIndex;

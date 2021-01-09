@@ -25,7 +25,14 @@
 #include "CanException.h"
 
 #include <string>
+#include <CanTypes.h>
 
 CanException::CanException(const std::string& message) : message_(message)
 {
 }
+
+CanException::CanException(const std::string& message, const CanChannelError chan_err) : message_(message)
+{
+    chan_err_ = chan_err;
+}
+

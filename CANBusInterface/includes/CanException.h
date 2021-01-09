@@ -28,6 +28,7 @@
 
 #include <exception>
 #include <string>
+#include "CanTypes.h"
 
 
 class CanException : public std::exception
@@ -35,12 +36,18 @@ class CanException : public std::exception
 
 public:
     explicit CanException(const std::string& message);
+    explicit CanException(const std::string &message, CanChannelError chan_err);
+
     const char* what() const noexcept override {
         return message_.c_str();
+    }
+    const CanChannelError chan_err(){
+        return chan_err_;
     }
 
 private:
     std::string message_;
+    CanChannelError chan_err_;
 };
 
 #endif

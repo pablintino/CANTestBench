@@ -22,23 +22,14 @@
  */
 
 
-#ifndef TEST_BENCH_TEST_H
-#define TEST_BENCH_TEST_H
+#include "ReceiveSimpleFramesTest.h"
 
+const std::string ReceiveSimpleFramesTest::TEST_NAME = "receive-simple-frames";
 
-#include <memory>
-#include "CanInterfaceChannel.h"
+ReceiveSimpleFramesTest::ReceiveSimpleFramesTest() : TestBenchTest(TEST_NAME){
 
-class TestBenchTest
-{
-public:
-	TestBenchTest(std::string name);
-	std::string name(void);
-	virtual ~TestBenchTest() {};
-	virtual bool run(std::shared_ptr<CanInterfaceChannel> channel) = 0;
+}
 
-private:
-    std::string _name;
-};
-
-#endif
+bool ReceiveSimpleFramesTest::run(std::shared_ptr<CanInterfaceChannel> channel){
+    return true;
+}

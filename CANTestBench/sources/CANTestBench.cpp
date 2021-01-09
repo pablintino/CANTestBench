@@ -23,6 +23,7 @@
 
 
 #include <spdlog/spdlog.h>
+#include <TestFactory.h>
 #include "TestBenchOptions.h"
 #include "CanException.h"
 #include "CanInterfaceFactory.h"
@@ -34,9 +35,6 @@ int main(int argc, char** argv)
 {
 
 	CanChannelError err;
-	
-	// TODO: Temporal hardcoded level
-	spdlog::set_level(spdlog::level::debug); // Set global log level to debug
 
 	std::unique_ptr<TestBenchOptions> opts = TestBenchOptions::parse(argc, argv);
 
@@ -53,7 +51,7 @@ int main(int argc, char** argv)
 		actionStatus status = iface->initialize();
 
 		if (status == actionStatus::OK) {
-			CanInterfaceChannel* chan = iface->get_channel(opts->interface_channel());
+			std::shared_ptr<CanInterfaceChannel> chan = iface->get_channel(opts->interface_channel());
 			spdlog::info("Selected CAN channel. [channel_name: {}, is_virtual: {}]", chan->name(), chan->vChannel());
 			err = chan->configure(opts->baudrate());
 			if (err != CanChannelError::NO_ERR)
@@ -67,17 +65,12 @@ int main(int argc, char** argv)
 				return -1;
 			}
 
-			/* TODO Test infinite loop*/
-			for(int i = 0; i< 4; i++)
-			{
-				CanChannelError err;
-				CanDataDescriptor data = chan->read(err);
-				if(err == CanChannelError::NO_ERR)
-				{
-					spdlog::info("Read data [data_id: {}, dlc: {}]", data.get_id(), data.get_dlc());
-				}
-				
-			}
+            std::unique_ptr<TestBenchTest> test = TestFactory::get_test(opts->test_name());
+            if(test->run(chan)){
+                spdlog::info("Test passed correctly");
+            }else{
+                spdlog::error("Test failed");
+            }
 
 			err = chan->disconnect();
 			if (err != CanChannelError::NO_ERR)

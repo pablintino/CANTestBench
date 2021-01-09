@@ -22,23 +22,12 @@
  */
 
 
-#ifndef TEST_BENCH_TEST_H
-#define TEST_BENCH_TEST_H
+#include "TestBenchTest.h"
 
 
-#include <memory>
-#include "CanInterfaceChannel.h"
+TestBenchTest::TestBenchTest(std::string name) : _name(name){
 
-class TestBenchTest
-{
-public:
-	TestBenchTest(std::string name);
-	std::string name(void);
-	virtual ~TestBenchTest() {};
-	virtual bool run(std::shared_ptr<CanInterfaceChannel> channel) = 0;
-
-private:
-    std::string _name;
-};
-
-#endif
+}
+std::string TestBenchTest::name(void){
+    return _name;
+}
