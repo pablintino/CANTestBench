@@ -40,12 +40,14 @@ public:
     std::string test_name();
 	unsigned int interface_channel();
 	CanBitrates baudrate();
-	
+	bool list_channels();
+
 private:
 	std::string interface_type_ = "";
 	unsigned int interface_channel_ = 0;
 	std::string test_name_ = "";
 	CanBitrates baudrate_ = CanBitrates::CAN500K;
+	bool list_channels_ = false;
 };
 
 #endif

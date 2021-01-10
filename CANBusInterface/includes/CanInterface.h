@@ -28,6 +28,7 @@
 #include <iostream>
 #include <vector> 
 #include <memory>
+#include <map>
 #include "CanInterfaceChannel.h"
 
 
@@ -42,7 +43,7 @@ public:
 	virtual actionStatus initialize(void) = 0;
 protected:
 	void setName(std::string name);
-	std::vector<std::shared_ptr<CanInterfaceChannel>> _channels;
+	std::map<uint8_t, std::shared_ptr<CanInterfaceChannel>> _channels;
 private:
 	std::string _name;
 };

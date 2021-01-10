@@ -35,6 +35,7 @@ const std::string option_can_channel_key = "chan";
 const std::string option_can_baudrate_key = "baudrate";
 const std::string option_can_interface_key = "iface";
 const std::string option_test_key = "test";
+const std::string option_can_list_channels_key = "list";
 
 
 std::unique_ptr<TestBenchOptions> TestBenchOptions::parse(int argc, char **argv) {
@@ -49,6 +50,7 @@ std::unique_ptr<TestBenchOptions> TestBenchOptions::parse(int argc, char **argv)
                  cxxopts::value<unsigned int>()->default_value("500000"))
                 ("i," + option_can_interface_key, "CAN interface type",
                  cxxopts::value<std::string>()->default_value("kvaser"))
+                ("l," + option_can_list_channels_key, "List CAN channels", cxxopts::value<bool>()->default_value("false"))
                 ("t," + option_test_key, "Test to run",cxxopts::value<std::string>());
 
 
@@ -79,7 +81,10 @@ std::unique_ptr<TestBenchOptions> TestBenchOptions::parse(int argc, char **argv)
                                                                     : "kvaser";
         tmp->interface_channel_ = opts.count(option_can_channel_key) ? opts[option_can_channel_key].as<unsigned int>()
                                                                      : 0;
-        if(!opts.count(option_test_key)){
+        tmp->list_channels_ = opts.count(option_can_list_channels_key) ? opts[option_can_list_channels_key].as<bool>()
+                                                                   : false;
+
+        if(!opts.count(option_test_key) && !tmp->list_channels_){
             throw std::runtime_error("Test option is mandatory");
         }
 
@@ -117,4 +122,8 @@ CanBitrates TestBenchOptions::baudrate() {
 
 std::string TestBenchOptions::test_name() {
     return test_name_;
+}
+
+bool TestBenchOptions::list_channels() {
+    return list_channels_;
 }

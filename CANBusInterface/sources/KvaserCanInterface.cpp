@@ -48,8 +48,9 @@ actionStatus KvaserCanInterface::initialize(void) {
             if (stat == canOK) {
                 stat = canGetChannelData(i, canCHANNELDATA_DEVDESCR_ASCII, &chName, sizeof(chName));
                 if (stat == canOK) {
-                    _channels.push_back(
-                            std::make_shared<KvaserCanChannel>(i, std::string(chName), tmp & canCHANNEL_CAP_VIRTUAL));
+                    _channels.insert({i,
+                                      std::make_shared<KvaserCanChannel>(i, std::string(chName),
+                                                                         tmp & canCHANNEL_CAP_VIRTUAL)});
                 } else {
                     spdlog::error("Cannot retrieve channel {} name. [err_code: {}, err: {}]", i, stat,
                                   KvaserUtils::from_kvaser_status(stat));

@@ -25,11 +25,12 @@
 #include "CanException.h"
 #include "CanInterface.h"
 #include "fmt/core.h"
+#include "Utils.h"
 
 CanInterface::CanInterface(std::string name) : _name(name) {}
 
 std::vector<std::shared_ptr<CanInterfaceChannel>> CanInterface::channels(void) {
-	return _channels;
+	return Utils::get_values<uint8_t, std::shared_ptr<CanInterfaceChannel>>(_channels);
 }
 
 std::string CanInterface::name() {

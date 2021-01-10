@@ -30,11 +30,13 @@
 
 class CanInterfaceChannel {
 public:
-    CanInterfaceChannel(std::string name, bool vChannel);
+    CanInterfaceChannel(uint8_t chan_index, std::string name, bool vChannel);
 
     std::string name(void);
 
     bool vChannel(void);
+
+    uint8_t chan_index(void);
 
     virtual ~CanInterfaceChannel() {};
 
@@ -52,6 +54,7 @@ public:
 private:
     std::string _name;
     bool _vChannel;
+    uint8_t _chan_index;
 };
 
 #endif

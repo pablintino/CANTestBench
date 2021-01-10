@@ -25,15 +25,20 @@
 #include "CanInterfaceChannel.h"
 
 
-CanInterfaceChannel::CanInterfaceChannel(std::string name, bool vChannel) : _name(name), _vChannel(vChannel)
-{
-	
+CanInterfaceChannel::CanInterfaceChannel(uint8_t chan_index, std::string name, bool vChannel) : _chan_index(chan_index),
+                                                                                                _name(name),
+                                                                                                _vChannel(vChannel) {
+
 }
 
 std::string CanInterfaceChannel::name(void) {
-	return _name;
+    return _name;
 }
 
 bool CanInterfaceChannel::vChannel(void) {
-	return _vChannel;
+    return _vChannel;
+}
+
+uint8_t CanInterfaceChannel::chan_index(void) {
+    return _chan_index;
 }

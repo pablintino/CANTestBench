@@ -31,58 +31,59 @@
 #include "KvaserCanInterface.h"
 
 
-int main(int argc, char** argv)
-{
+int main(int argc, char **argv) {
 
-	CanChannelError err;
+    CanChannelError err;
 
-	std::unique_ptr<TestBenchOptions> opts = TestBenchOptions::parse(argc, argv);
+    std::unique_ptr<TestBenchOptions> opts = TestBenchOptions::parse(argc, argv);
 
-	if (opts == nullptr)
-	{
-		return 0;
-	}
+    if (opts == nullptr) {
+        return 0;
+    }
 
-	try
-	{
-		// Obtain the selected CAN interface
-		std::unique_ptr<CanInterface> iface = CanIntefaceFactory::make_inteface(opts->interface_type());
+    try {
+        // Obtain the selected CAN interface
+        std::unique_ptr<CanInterface> iface = CanIntefaceFactory::make_inteface(opts->interface_type());
 
-		actionStatus status = iface->initialize();
+        actionStatus status = iface->initialize();
 
-		if (status == actionStatus::OK) {
-			std::shared_ptr<CanInterfaceChannel> chan = iface->get_channel(opts->interface_channel());
-			spdlog::info("Selected CAN channel. [channel_name: {}, is_virtual: {}]", chan->name(), chan->vChannel());
-			err = chan->configure(opts->baudrate());
-			if (err != CanChannelError::NO_ERR)
-			{
-				return -1;
-			}
+        if (status == actionStatus::OK) {
 
-			err = chan->connect();
-			if (err != CanChannelError::NO_ERR)
-			{
-				return -1;
-			}
+            if (!opts->list_channels()) {
 
-            std::unique_ptr<TestBenchTest> test = TestFactory::get_test(opts->test_name());
-            if(test->run(chan)){
-                spdlog::info("Test passed correctly");
-            }else{
-                spdlog::error("Test failed");
+                std::shared_ptr<CanInterfaceChannel> chan = iface->get_channel(opts->interface_channel());
+                spdlog::info("Selected CAN channel. [channel_name: {}, is_virtual: {}]", chan->name(),
+                             chan->vChannel());
+                err = chan->configure(opts->baudrate());
+                if (err != CanChannelError::NO_ERR) {
+                    return -1;
+                }
+
+                err = chan->connect();
+                if (err != CanChannelError::NO_ERR) {
+                    return -1;
+                }
+
+                std::unique_ptr<TestBenchTest> test = TestFactory::get_test(opts->test_name());
+                if (test->run(chan)) {
+                    spdlog::info("Test passed correctly");
+                } else {
+                    spdlog::error("Test failed");
+                }
+
+                err = chan->disconnect();
+                if (err != CanChannelError::NO_ERR) {
+                    return -1;
+                }
+
+            } else {
+                for (std::shared_ptr<CanInterfaceChannel> &chan : iface->channels()) {
+                    spdlog::info("CAN Channel {} [channel_name: {}, is_virtual: {}]", chan->chan_index(), chan->name(),
+                                 chan->vChannel());
+                }
             }
-
-			err = chan->disconnect();
-			if (err != CanChannelError::NO_ERR)
-			{
-				return -1;
-			}
-			
-		}
-	}catch (const CanException& ex)
-	{
-		spdlog::error("An error occurred while initializing CAN interface. {}", ex.what());
-	}
-
-	// TODO: Ready to go On-Bus and write raw data to the proper interface
+        }
+    } catch (const CanException &ex) {
+        spdlog::error("An error occurred while initializing CAN interface. {}", ex.what());
+    }
 }
