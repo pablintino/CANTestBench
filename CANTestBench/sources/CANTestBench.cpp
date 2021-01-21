@@ -23,7 +23,9 @@
 
 
 #include <spdlog/spdlog.h>
-#include <TestFactory.h>
+#include <ConsolePrinter.h>
+#include <TestBenchCommandsRunner.h>
+#include <ProgramArgumentsException.h>
 #include "TestBenchOptions.h"
 #include "CanException.h"
 #include "CanInterfaceFactory.h"
@@ -33,57 +35,20 @@
 
 int main(int argc, char **argv) {
 
-    CanChannelError err;
-
     std::unique_ptr<TestBenchOptions> opts = TestBenchOptions::parse(argc, argv);
-
-    if (opts == nullptr) {
-        return 0;
-    }
 
     try {
         // Obtain the selected CAN interface
         std::unique_ptr<CanInterface> iface = CanIntefaceFactory::make_inteface(opts->interface_type());
 
-        actionStatus status = iface->initialize();
-
-        if (status == actionStatus::OK) {
-
-            if (!opts->list_channels()) {
-
-                std::shared_ptr<CanInterfaceChannel> chan = iface->get_channel(opts->interface_channel());
-                spdlog::info("Selected CAN channel. [channel_name: {}, is_virtual: {}]", chan->name(),
-                             chan->vChannel());
-                err = chan->configure(opts->baudrate());
-                if (err != CanChannelError::NO_ERR) {
-                    return -1;
-                }
-
-                err = chan->connect();
-                if (err != CanChannelError::NO_ERR) {
-                    return -1;
-                }
-
-                std::unique_ptr<TestBenchTest> test = TestFactory::get_test(opts->test_name());
-                if (test->run(chan)) {
-                    spdlog::info("Test passed correctly");
-                } else {
-                    spdlog::error("Test failed");
-                }
-
-                err = chan->disconnect();
-                if (err != CanChannelError::NO_ERR) {
-                    return -1;
-                }
-
-            } else {
-                for (std::shared_ptr<CanInterfaceChannel> &chan : iface->channels()) {
-                    spdlog::info("CAN Channel {} [channel_name: {}, is_virtual: {}]", chan->chan_index(), chan->name(),
-                                 chan->vChannel());
-                }
-            }
+        if (iface->initialize() == actionStatus::OK) {
+            return TestBenchCommandsRunner().run(std::move(opts), std::move(iface));
         }
+    } catch (ProgramArgumentsException &e) {
+        spdlog::error("Error parsing program options: {}", e.what());
     } catch (const CanException &ex) {
         spdlog::error("An error occurred while initializing CAN interface. {}", ex.what());
     }
+    // If we reach this line an error occurred
+    return 1;
 }

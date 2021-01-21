@@ -22,32 +22,23 @@
  */
 
 
-#ifndef TEST_BENCH_OPTIONS_H
-#define TEST_BENCH_OPTIONS_H
+#include <iostream>
+#include "ConsolePrinter.h"
+#include "fmt/core.h"
 
+void ConsolePrinter::PrintProgramOptions(std::string help_message) {
 
-#include <memory>
-#include <string>
+    std::cout << help_message << std::endl;
 
-#include "CanTypes.h"
+}
 
-class TestBenchOptions
-{
-public:
-
-	static std::unique_ptr<TestBenchOptions> parse(int argc, char** argv);
-	std::string interface_type();
-    std::string test_name();
-	unsigned int interface_channel();
-	CanBitrates baudrate();
-	std::string command();
-
-private:
-	std::string interface_type_ = "";
-	unsigned int interface_channel_ = 0;
-	std::string test_name_ = "";
-	CanBitrates baudrate_ = CanBitrates::CAN500K;
-	std::string command_ = "";
-};
-
-#endif
+void ConsolePrinter::PrintInterfaceChannels(std::vector<std::shared_ptr<CanInterfaceChannel>> chans) {
+    if(!chans.empty()){
+        for (std::shared_ptr<CanInterfaceChannel> &chan : chans) {
+            std::cout << fmt::format("CAN Channel {}:\n\t Name: {}\n\t Virtual: {}\n", chan->chan_index(), chan->name(),
+                                     chan->vChannel());
+        }
+    }else{
+        std::cout << "No CAN channels found!" << std::endl;
+    }
+}

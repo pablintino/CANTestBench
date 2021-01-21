@@ -22,32 +22,26 @@
  */
 
 
-#ifndef TEST_BENCH_OPTIONS_H
-#define TEST_BENCH_OPTIONS_H
+#ifndef TESTBENCHCOMMANDSRUNNER_H
+#define TESTBENCHCOMMANDSRUNNER_H
 
-
-#include <memory>
 #include <string>
+#include <map>
+#include <CanInterface.h>
+#include "TestBenchCommandConstants.h"
+#include "TestBenchOptions.h"
 
-#include "CanTypes.h"
+typedef int (*FuncType)(std::unique_ptr<TestBenchOptions> opts, std::unique_ptr<CanInterface> iface);
 
-class TestBenchOptions
-{
-public:
-
-	static std::unique_ptr<TestBenchOptions> parse(int argc, char** argv);
-	std::string interface_type();
-    std::string test_name();
-	unsigned int interface_channel();
-	CanBitrates baudrate();
-	std::string command();
-
-private:
-	std::string interface_type_ = "";
-	unsigned int interface_channel_ = 0;
-	std::string test_name_ = "";
-	CanBitrates baudrate_ = CanBitrates::CAN500K;
-	std::string command_ = "";
+class TestBenchCommandsRunner {
+    public:
+        TestBenchCommandsRunner(void);
+        int run(std::unique_ptr<TestBenchOptions> opts, std::unique_ptr<CanInterface> iface);
+    private:
+        static int list_channels_command(std::unique_ptr<TestBenchOptions>  opts, std::unique_ptr<CanInterface> iface);
+        static int run_test_command(std::unique_ptr<TestBenchOptions>  opts, std::unique_ptr<CanInterface> iface);
+        std::map<std::string, FuncType> commands_map;
 };
 
-#endif
+
+#endif //TESTBENCHCOMMANDSRUNNER_H

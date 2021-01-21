@@ -26,7 +26,10 @@
 #include <iostream>
 #include <spdlog/spdlog.h>
 #include <cxxopts.hpp>
+#include <ConsolePrinter.h>
+#include <ProgramArgumentsException.h>
 #include "CanUtils.h"
+#include "TestBenchCommandConstants.h"
 
 
 const std::string option_help_key = "help";
@@ -34,78 +37,61 @@ const std::string option_debug_mode_key = "debug";
 const std::string option_can_channel_key = "chan";
 const std::string option_can_baudrate_key = "baudrate";
 const std::string option_can_interface_key = "iface";
-const std::string option_test_key = "test";
-const std::string option_can_list_channels_key = "list";
 
 
 std::unique_ptr<TestBenchOptions> TestBenchOptions::parse(int argc, char **argv) {
-    try {
-        cxxopts::Options options("cantestbench", "CAN Test Bench for pablintino CANopen modules development");
 
-        options.add_options()
-                ("h," + option_help_key, "produce help message")
-                ("d," + option_debug_mode_key, "debug mode", cxxopts::value<bool>()->default_value("false"))
-                ("c," + option_can_channel_key, "CAN channel ID", cxxopts::value<unsigned int>()->default_value("0"))
-                ("b," + option_can_baudrate_key, "CAN interface baudrate",
-                 cxxopts::value<unsigned int>()->default_value("500000"))
-                ("i," + option_can_interface_key, "CAN interface type",
-                 cxxopts::value<std::string>()->default_value("kvaser"))
-                ("l," + option_can_list_channels_key, "List CAN channels", cxxopts::value<bool>()->default_value("false"))
-                ("t," + option_test_key, "Test to run",cxxopts::value<std::string>());
+    cxxopts::Options options("cantestbench", "CAN Test Bench for pablintino CANopen modules development");
+
+    options.add_options()
+            ("h," + option_help_key, "produce help message")
+            ("d," + option_debug_mode_key, "debug mode")
+            ("c," + option_can_channel_key, "CAN channel ID",
+             cxxopts::value<unsigned int>()->default_value("0")->implicit_value("0"))
+            ("b," + option_can_baudrate_key, "CAN interface baudrate",
+             cxxopts::value<unsigned int>()->default_value("500000")->implicit_value("500000"))
+            ("i," + option_can_interface_key, "CAN interface type",
+             cxxopts::value<std::string>()->default_value("kvaser")->implicit_value("kvaser"))
+            ("l," + TEST_BENCH_COMMAND_LIST_CHANNELS, "List CAN channels")
+            ("t," + TEST_BENCH_COMMAND_RUN_TEST, "Test to run", cxxopts::value<std::string>());
 
 
-        cxxopts::ParseResult opts = options.parse(argc, argv);
+    cxxopts::ParseResult opts = options.parse(argc, argv);
 
-        if (opts.count(option_help_key) || opts.arguments().size() == 0) {
-            std::cout << options.help() << "\n";
-            exit(0);
+    if (opts.count(option_help_key) || opts.arguments().size() == 0) {
+        ConsolePrinter::PrintProgramOptions(options.help());
+        exit(0);
+    }
+
+    // Enable debug mode if requested
+    spdlog::set_level(opts[option_debug_mode_key].as<bool>() ? spdlog::level::debug : spdlog::level::info);
+
+    TestBenchOptions *tmp = new TestBenchOptions();
+    if (opts.count(option_can_baudrate_key)) {
+        unsigned int bitrate_opt = opts[option_can_baudrate_key].as<unsigned int>();
+        if (!check_baud_rate_enum_class(bitrate_opt)) {
+            throw ProgramArgumentsException("The given bitrate is not supported");
         }
 
-        // Enable debug mode if requested
-        spdlog::set_level(opts[option_debug_mode_key].as<bool>() ? spdlog::level::debug : spdlog::level::info);
-
-        TestBenchOptions *tmp = new TestBenchOptions();
-        if (opts.count(option_can_baudrate_key)) {
-            unsigned int bitrate_opt = opts[option_can_baudrate_key].as<unsigned int>();
-            if (!check_baud_rate_enum_class(bitrate_opt)) {
-                // TODO: Consider using a custom exception
-                throw std::runtime_error("The given bitrate is not supported");
-            }
-
-            tmp->baudrate_ = static_cast<CanBitrates>(bitrate_opt);
-        } else {
-            tmp->baudrate_ = CanBitrates::CAN500K;
-        }
-
-        tmp->interface_type_ = opts.count(option_can_interface_key) ? opts[option_can_interface_key].as<std::string>()
-                                                                    : "kvaser";
-        tmp->interface_channel_ = opts.count(option_can_channel_key) ? opts[option_can_channel_key].as<unsigned int>()
-                                                                     : 0;
-        tmp->list_channels_ = opts.count(option_can_list_channels_key) ? opts[option_can_list_channels_key].as<bool>()
-                                                                   : false;
-
-        if(!opts.count(option_test_key) && !tmp->list_channels_){
-            throw std::runtime_error("Test option is mandatory");
-        }
-
-        tmp->test_name_ = opts[option_test_key].as<std::string>();
-
-        // Just log the parameters of the execution for user information
-        spdlog::info("Test Bench Options \r\n\tBaudrate: {}\r\n\tInteface: {}\r\n\tChannel: {}\r\n\tTest: {}",
-                     tmp->baudrate_, tmp->interface_type_, tmp->interface_channel_, tmp->test_name_);
-
-
-        return std::unique_ptr<TestBenchOptions>(tmp);
-
+        tmp->baudrate_ = static_cast<CanBitrates>(bitrate_opt);
+    } else {
+        tmp->baudrate_ = CanBitrates::CAN500K;
     }
-    catch (std::exception &e) {
-        spdlog::error("Error parsing program options: {}", e.what());
-        return nullptr;
-    }
-    catch (...) {
-        spdlog::error("Unknown error parsing program options");
-        return nullptr;
-    }
+
+    tmp->interface_type_ = opts[option_can_interface_key].as<std::string>();
+    tmp->interface_channel_ = opts[option_can_channel_key].as<unsigned int>();
+
+    /* Parse the command to exec */
+    if (opts.count(TEST_BENCH_COMMAND_RUN_TEST)) {
+        tmp->command_ = TEST_BENCH_COMMAND_RUN_TEST;
+        tmp->test_name_ = opts[TEST_BENCH_COMMAND_RUN_TEST].as<std::string>();
+    } else if (opts.count(TEST_BENCH_COMMAND_LIST_CHANNELS)) {
+        tmp->command_ = TEST_BENCH_COMMAND_LIST_CHANNELS;
+    } else {
+        throw std::runtime_error("Command to provided");
+    };
+
+    return std::unique_ptr<TestBenchOptions>(tmp);
 }
 
 unsigned int TestBenchOptions::interface_channel() {
@@ -124,6 +110,6 @@ std::string TestBenchOptions::test_name() {
     return test_name_;
 }
 
-bool TestBenchOptions::list_channels() {
-    return list_channels_;
+std::string TestBenchOptions::command() {
+    return command_;
 }

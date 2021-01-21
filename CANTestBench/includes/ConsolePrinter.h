@@ -22,32 +22,23 @@
  */
 
 
-#ifndef TEST_BENCH_OPTIONS_H
-#define TEST_BENCH_OPTIONS_H
+#ifndef CONSOLEPRINTER_H
+#define CONSOLEPRINTER_H
 
-
-#include <memory>
 #include <string>
+#include <vector>
+#include <memory>
+#include <CanInterfaceChannel.h>
 
-#include "CanTypes.h"
+class ConsolePrinter {
 
-class TestBenchOptions
-{
 public:
 
-	static std::unique_ptr<TestBenchOptions> parse(int argc, char** argv);
-	std::string interface_type();
-    std::string test_name();
-	unsigned int interface_channel();
-	CanBitrates baudrate();
-	std::string command();
+    static void PrintProgramOptions(std::string help_message);
 
-private:
-	std::string interface_type_ = "";
-	unsigned int interface_channel_ = 0;
-	std::string test_name_ = "";
-	CanBitrates baudrate_ = CanBitrates::CAN500K;
-	std::string command_ = "";
+    static void PrintInterfaceChannels(std::vector<std::shared_ptr<CanInterfaceChannel>> chans);
+
 };
 
-#endif
+
+#endif //CONSOLEPRINTER_H

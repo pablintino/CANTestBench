@@ -31,5 +31,7 @@ ReceiveSimpleFramesTest::ReceiveSimpleFramesTest() : TestBenchTest(TEST_NAME){
 }
 
 bool ReceiveSimpleFramesTest::run(std::shared_ptr<CanInterfaceChannel> channel){
+
+
     return true;
 }
